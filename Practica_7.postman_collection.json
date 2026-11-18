@@ -1,0 +1,266 @@
+{
+  "info": {
+    "name": "Práctica 7 — API de productos con MongoDB",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "idProducto",
+      "value": ""
+    },
+    {
+      "key": "idPersistente",
+      "value": ""
+    },
+    {
+      "key": "idInexistente",
+      "value": "000000000000000000000001"
+    }
+  ],
+  "item": [
+    {
+      "name": "Preparación — Guardar producto para el reinicio",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/productos",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Teclado USB\",\n  \"descripcion\": \"Producto para demostrar persistencia\",\n  \"precio\": 1200\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "if (pm.response.code === 201) pm.collectionVariables.set(\"idPersistente\", pm.response.json()._id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "1 — Crear producto",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/productos",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Audífonos Bluetooth\",\n  \"descripcion\": \"Audífonos inalámbricos con micrófono\",\n  \"precio\": 2200\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "if (pm.response.code === 201) pm.collectionVariables.set(\"idProducto\", pm.response.json()._id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 — Crear producto sin precio",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/productos",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Audífonos Bluetooth\",\n  \"descripcion\": \"Audífonos inalámbricos con micrófono\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3a — Listar productos",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/productos"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3b — Consultar por ID",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/productos/{{idProducto}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 — Actualizar producto existente",
+      "request": {
+        "method": "PUT",
+        "url": "{{baseUrl}}/productos/{{idProducto}}",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Audífonos Bluetooth\",\n  \"descripcion\": \"Audífonos inalámbricos con micrófono\",\n  \"precio\": 1950\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 — Actualizar producto inexistente",
+      "request": {
+        "method": "PUT",
+        "url": "{{baseUrl}}/productos/{{idInexistente}}",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Audífonos Bluetooth\",\n  \"descripcion\": \"Audífonos inalámbricos con micrófono\",\n  \"precio\": 1950\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6 — Eliminar producto",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/productos/{{idProducto}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7 — Eliminar nuevamente el mismo producto",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/productos/{{idProducto}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "8a — Listar después de reiniciar Node",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/productos"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"El producto persiste\", () => pm.expect(pm.response.json().some(p => p._id === pm.collectionVariables.get(\"idPersistente\"))).to.be.true);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "8b — Confirmar que se conserva el mismo ID",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/productos/{{idPersistente}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
